@@ -1,39 +1,30 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const cors = require('cors');
+const path = require('path');
 
 const app = express();
-app.use(cors()); // Allow cross-origin requests
-
-// Create an HTTP server
 const server = http.createServer(app);
+const io = new Server(server);
 
-// Set up Socket.io with long-polling as the transport
-const io = new Server(server, {
-  cors: {
-    origin: '*',   // Allow all origins
-    methods: ['GET', 'POST'],
-  },
-  transports: ['polling'], // Use long-polling instead of WebSockets
-});
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from "public" folder
 
-// Handle Socket.io connections
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  // Listen for 'chatMessage' event and broadcast to all clients
+  console.log('A user connected');
+  
+  // Listen for incoming messages
   socket.on('chatMessage', (msg) => {
+    // Broadcast message to all users
     io.emit('chatMessage', msg);
   });
 
-  // Handle user disconnect
+  // Handle disconnection
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('A user disconnected');
   });
 });
 
-// Export the server for Vercel's Serverless functions
-module.exports = (req, res) => {
-  server.emit('request', req, res);
-};
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
