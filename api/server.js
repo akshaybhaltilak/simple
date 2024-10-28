@@ -9,7 +9,7 @@ const app = express();
 
 // Enable CORS for the frontend
 app.use(cors({
-  origin: 'http://localhost:5173', // Replace with your frontend URL in production
+  origin: 'https://sanchat.vercel.app', // Replace with your frontend URL in production
   methods: ['GET', 'POST']
 }));
 
@@ -17,7 +17,7 @@ app.use(cors({
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // Adjust for production use
+    origin: 'https://sanchat.vercel.app', // Adjust for production use
     methods: ['GET', 'POST']
   }
 });
